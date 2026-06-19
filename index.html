@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebraic Unit Engine</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        math: {
+                            lightBg: '#fbfbf9', // Euler Cream
+                            lightCard: '#ffffff',
+                            lightBorder: '#e4e4db',
+                            lightText: '#1c1e1a',
+                            lightAccent: '#2b5c8f', // Cobalt Blue
+                            lightMuted: '#686e64',
+                            
+                            darkBg: '#090a0f', // Vector Obsidian
+                            darkCard: '#12141d',
+                            darkBorder: '#1f2433',
+                            darkText: '#f3f4f6',
+                            darkAccent: '#6366f1', // Indigo Glow
+                            darkMuted: '#9ca3af'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://rsms.me/">
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Free Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Application Logic (Deferred for rendering optimization) -->
+    <script src="app.js" defer></script>
+</head>
+<body class="bg-math-lightBg dark:bg-math-darkBg text-math-lightText dark:text-math-darkText math-grid-bg min-h-screen flex flex-col relative antialiased">
+
+    <!-- Interactive Math Background Canvas -->
+    <canvas id="mathCanvas" class="absolute top-0 left-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- Master UI Wrapper -->
+    <div class="relative z-10 flex-grow flex flex-col max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8">
+        
+        <!-- Top Navigation Header -->
+        <header class="flex justify-between items-center mb-8 border-b border-math-lightBorder dark:border-math-darkBorder pb-4 animate-float">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-math-lightAccent dark:bg-math-darkAccent flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-square-root-variable text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight uppercase font-mono">Algebraic Unit Engine</h1>
+                    <p class="text-xs text-math-lightMuted dark:text-math-darkMuted font-mono">SYS.VER // 2.026.MATH</p>
+                </div>
+            </div>
+
+            <!-- Mathematical Parameters Monitor & Theme Selector -->
+            <div class="flex items-center gap-4">
+                <div class="hidden md:flex flex-col text-right font-mono text-[10px] text-math-lightMuted dark:text-math-darkMuted border-r border-math-lightBorder dark:border-math-darkBorder pr-4">
+                    <div>POINTER: <span id="coordsDisplay" class="text-math-lightAccent dark:text-math-darkAccent font-bold">X:000, Y:000</span></div>
+                    <div>VECTOR OSCILLATIONS: <span id="nodesCounter" class="text-emerald-500 font-bold">36 RAD</span></div>
+                </div>
+
+                <!-- Dark/Light Premium Toggle -->
+                <button id="themeToggleBtn" class="w-10 h-10 rounded-full border border-math-lightBorder dark:border-math-darkBorder flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors duration-300" aria-label="Toggle mathematical color theme">
+                    <i class="fa-solid fa-sun text-yellow-500 dark:hidden text-sm"></i>
+                    <i class="fa-solid fa-moon hidden dark:block text-indigo-400 text-sm"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Horizontal Scrollable Mathematical Category Row -->
+        <nav class="mb-8 overflow-x-auto py-2 -mx-4 px-4 flex gap-2 scrollbar-none" id="categoriesBar">
+            <!-- Dynamically populated via javascript -->
+        </nav>
+
+        <!-- Main Interactive Panel Structure -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 perspective-container flex-grow items-start">
+            
+            <!-- Left Side Panel: Interactive Conversion Control Pad (Tilts in 3D) -->
+            <main class="lg:col-span-7 w-full">
+                <div id="converterCard" class="tilt-card bg-math-lightCard dark:bg-math-darkCard border border-math-lightBorder dark:border-math-darkBorder rounded-2xl p-6 md:p-8 shadow-2xl shadow-gray-200/50 dark:shadow-black/50 relative overflow-hidden backdrop-blur-md bg-opacity-95 dark:bg-opacity-95">
+                    
+                    <!-- Decorative Geometrical Top Corner Angle -->
+                    <div class="absolute top-0 right-0 w-12 h-12 border-b border-l border-math-lightBorder dark:border-math-darkBorder flex items-center justify-center font-mono text-[9px] text-math-lightMuted dark:text-math-darkMuted pointer-events-none bg-gray-50 dark:bg-gray-900/40 rounded-bl-xl">
+                        Δ-09
+                    </div>
+
+                    <!-- Category Status / Variable Readout -->
+                    <div class="flex items-center gap-2 mb-6 font-mono text-xs text-math-lightAccent dark:text-math-darkAccent bg-indigo-50 dark:bg-indigo-950/30 px-3 py-1.5 rounded-md w-fit">
+                        <span class="pulse-dot w-2 h-2 rounded-full bg-math-lightAccent dark:bg-math-darkAccent"></span>
+                        <span>FUNCTIONAL SYSTEM: <span id="activeCategoryName" class="font-bold">LENGTH</span></span>
+                    </div>
+
+                    <!-- INPUT BLOCKS (FROM and TO Grid Layout) -->
+                    <div class="grid grid-cols-1 md:grid-cols-9 gap-4 items-center">
+                        
+                        <!-- "FROM" Container Block -->
+                        <div class="md:col-span-4 p-4 rounded-xl border border-math-lightBorder dark:border-math-darkBorder bg-gray-50/50 dark:bg-gray-900/30 transition-all duration-300 focus-within:border-math-lightAccent focus-within:dark:border-math-darkAccent">
+                            <label class="block text-xs font-mono text-math-lightMuted dark:text-math-darkMuted mb-2 uppercase tracking-wider">INPUT QUANTITY [α]</label>
+                            
+                            <!-- Large Input Field -->
+                            <input type="number" id="fromInput" class="w-full bg-transparent text-2xl font-bold font-mono outline-none border-b border-transparent focus:border-math-lightAccent focus:dark:border-math-darkAccent pb-1 text-math-lightText dark:text-math-darkText" value="1" placeholder="0.0">
+                            
+                            <!-- Custom Styled Select dropdown -->
+                            <div class="mt-4 relative">
+                                <select id="fromUnitSelect" class="w-full bg-white dark:bg-gray-900 border border-math-lightBorder dark:border-math-darkBorder rounded-lg p-2.5 font-mono text-xs font-semibold appearance-none outline-none cursor-pointer pr-8 text-math-lightText dark:text-math-darkText focus:ring-2 focus:ring-indigo-500/20">
+                                    <!-- Populated via script -->
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-math-lightMuted dark:text-math-darkMuted">
+                                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3D Geometric Swap Trigger Action -->
+                        <div class="md:col-span-1 flex justify-center py-2 md:py-0">
+                            <button id="swapUnitsBtn" class="w-12 h-12 rounded-full border border-math-lightBorder dark:border-math-darkBorder bg-math-lightCard dark:bg-math-darkCard flex items-center justify-center hover:bg-math-lightAccent hover:text-white hover:dark:bg-math-darkAccent hover:shadow-lg hover:shadow-indigo-500/20 transition-all duration-500 active:scale-95" title="Swap algebraic parameters">
+                                <i id="swapIcon" class="fa-solid fa-right-left text-sm rotate-90 md:rotate-0 transition-transform duration-500"></i>
+                            </button>
+                        </div>
+
+                        <!-- "TO" Container Block -->
+                        <div class="md:col-span-4 p-4 rounded-xl border border-math-lightBorder dark:border-math-darkBorder bg-gray-50/50 dark:bg-gray-900/30 transition-all duration-300 focus-within:border-math-lightAccent focus-within:dark:border-math-darkAccent">
+                            <label class="block text-xs font-mono text-math-lightMuted dark:text-math-darkMuted mb-2 uppercase tracking-wider">RESOLVED VALUE [β]</label>
+                            
+                            <!-- Display calculated read-only value -->
+                            <div class="relative">
+                                <input type="text" id="toOutput" class="w-full bg-transparent text-2xl font-bold font-mono outline-none border-b border-transparent pb-1 text-math-lightAccent dark:text-indigo-400" readonly value="1.000000">
+                                <button id="copyResultBtn" class="absolute right-0 top-1/2 -translate-y-1/2 text-xs text-math-lightMuted dark:text-math-darkMuted hover:text-math-lightAccent hover:dark:text-indigo-400 p-1.5" title="Copy to clipboard">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+
+                            <!-- Custom Styled Select dropdown -->
+                            <div class="mt-4 relative">
+                                <select id="toUnitSelect" class="w-full bg-white dark:bg-gray-900 border border-math-lightBorder dark:border-math-darkBorder rounded-lg p-2.5 font-mono text-xs font-semibold appearance-none outline-none cursor-pointer pr-8 text-math-lightText dark:text-math-darkText focus:ring-2 focus:ring-indigo-500/20">
+                                    <!-- Populated via script -->
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-math-lightMuted dark:text-math-darkMuted">
+                                    <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Precision Slide Scale Controller -->
+                    <div class="mt-8 pt-6 border-t border-math-lightBorder dark:border-math-darkBorder">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-mono font-medium tracking-wide text-math-lightMuted dark:text-math-darkMuted uppercase">Mathematical Decimal Resolution</span>
+                            <span class="text-xs font-mono font-bold text-math-lightAccent dark:text-math-darkAccent" id="decimalPrecisionText">6 Decimals</span>
+                        </div>
+                        <input type="range" id="precisionRange" min="0" max="12" value="6" class="w-full h-1 bg-math-lightBorder dark:bg-math-darkBorder rounded-lg appearance-none cursor-pointer accent-indigo-600 focus:outline-none">
+                    </div>
+
+                    <!-- High-Resolution Relative Scale Comparer (Visual Bars) -->
+                    <div class="mt-8 p-4 rounded-xl border border-math-lightBorder dark:border-math-darkBorder bg-gray-50/20 dark:bg-gray-900/10">
+                        <h3 class="text-xs font-mono font-bold text-math-lightMuted dark:text-math-darkMuted mb-4 uppercase tracking-wider">Comparative Amplitude Visualizer</h3>
+                        
+                        <div class="space-y-4">
+                            <!-- Input Unit magnitude -->
+                            <div>
+                                <div class="flex justify-between text-[11px] font-mono mb-1.5">
+                                    <span class="truncate max-w-[200px]" id="scaleLabelFrom">1 [From Unit]</span>
+                                    <span id="scalePercentageFrom">100%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-800/80 overflow-hidden relative">
+                                    <div id="scaleBarFrom" class="h-full bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full transition-all duration-700 ease-out" style="width: 100%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Target Unit magnitude -->
+                            <div>
+                                <div class="flex justify-between text-[11px] font-mono mb-1.5">
+                                    <span class="truncate max-w-[200px]" id="scaleLabelTo">0.001 [To Unit]</span>
+                                    <span id="scalePercentageTo">0.1%</span>
+                                </div>
+                                <div class="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-800/80 overflow-hidden relative">
+                                    <div id="scaleBarTo" class="h-full bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full transition-all duration-700 ease-out" style="width: 0.1%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+
+            <!-- Right Side Panel: Step-by-Step Proof Sheet & History Log -->
+            <aside class="lg:col-span-5 w-full space-y-6">
+                
+                <!-- Proof Sheet Panel -->
+                <div class="bg-math-lightCard dark:bg-math-darkCard border border-math-lightBorder dark:border-math-darkBorder rounded-2xl p-6 shadow-xl relative overflow-hidden backdrop-blur-md bg-opacity-95 dark:bg-opacity-95">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-math-lightBorder dark:border-math-darkBorder">
+                        <h2 class="text-xs font-bold font-mono tracking-wider uppercase text-math-lightMuted dark:text-math-darkMuted flex items-center gap-2">
+                            <i class="fa-solid fa-compass-drafting text-math-lightAccent dark:text-math-darkAccent"></i> ALGEBRAIC EQUATION PROOF
+                        </h2>
+                        <button id="copyProofBtn" class="text-[10px] font-mono text-math-lightAccent dark:text-math-darkAccent hover:underline" title="Copy proof equations">
+                            COPY FORMULA
+                        </button>
+                    </div>
+
+                    <!-- LaTeX-style clean math breakdown displays -->
+                    <div class="space-y-4 py-2 font-mono">
+                        
+                        <!-- Primary Function Formulation -->
+                        <div class="bg-gray-50 dark:bg-gray-900/50 p-3.5 rounded-lg border border-math-lightBorder/50 dark:border-math-darkBorder/50 text-center relative">
+                            <div class="absolute top-1.5 left-1.5 text-[8px] text-math-lightMuted dark:text-math-darkMuted uppercase">SYSTEM FUNCTION</div>
+                            <div class="text-sm md:text-base font-bold text-math-lightText dark:text-math-darkText mt-1" id="formulaGeneral">
+                                f(x) = x · K
+                            </div>
+                        </div>
+
+                        <!-- Step-by-Step active calculation readout -->
+                        <div class="text-xs space-y-2.5 text-math-lightMuted dark:text-math-darkMuted">
+                            <div class="flex justify-between items-center bg-gray-50/30 dark:bg-gray-900/10 p-2 rounded">
+                                <span>1. Base Constant</span>
+                                <span class="font-bold text-math-lightText dark:text-math-darkText text-right" id="proofBaseConst">1.0</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50/30 dark:bg-gray-900/10 p-2 rounded">
+                                <span>2. Operation Math</span>
+                                <span class="font-bold text-math-lightText dark:text-math-darkText text-right" id="proofOperation">Multiply x by Factor</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-gray-50/30 dark:bg-gray-900/10 p-2 rounded">
+                                <span>3. Calculated Proof</span>
+                                <span class="font-bold text-math-lightAccent dark:text-math-darkAccent text-right truncate max-w-[220px]" id="proofCalculated">1.0 = 1.0</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Live Conversions Log Panel -->
+                <div class="bg-math-lightCard dark:bg-math-darkCard border border-math-lightBorder dark:border-math-darkBorder rounded-2xl p-6 shadow-xl relative backdrop-blur-md bg-opacity-95 dark:bg-opacity-95">
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-math-lightBorder dark:border-math-darkBorder">
+                        <h2 class="text-xs font-bold font-mono tracking-wider uppercase text-math-lightMuted dark:text-math-darkMuted flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left"></i> CALCULATION CHRONOLOGY
+                        </h2>
+                        <button id="clearHistoryBtn" class="text-[10px] text-red-500 hover:text-red-600 font-mono tracking-wide" title="Clear recorded conversions">
+                            CLEAR ALL
+                        </button>
+                    </div>
+
+                    <!-- Chronological List -->
+                    <div class="max-h-56 overflow-y-auto pr-1 space-y-2" id="historyLogList">
+                        <div class="text-center py-6 text-xs font-mono text-math-lightMuted dark:text-math-darkMuted" id="historyEmptyState">
+                            No conversions calculated yet.
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+
+        </div>
+
+        <!-- Master Footer -->
+        <footer class="mt-12 border-t border-math-lightBorder dark:border-math-darkBorder pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-mono text-math-lightMuted dark:text-math-darkMuted">
+            <div>
+                ALGEBRAIC UNIT ENGINE &copy; 2026. MATHEMATICAL CLEAN UI FRAMEWORK.
+            </div>
+            <div class="flex gap-4">
+                <span>COORD SYSTEM: 3D PROJECTION</span>
+                <span>ACCURACY: FLOAT-64</span>
+            </div>
+        </footer>
+
+    </div>
+</body>
+</html>
